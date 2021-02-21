@@ -17,6 +17,7 @@
 #
 # TODO list
 # 1. [07/02/2021]. Save corrected images
+# 2. [20/02/2021]. Sigma clipping
 #
 # Marcial Becerril, @ 24 January 2021
 # Latest Revision: 14 Feb 2021, 01:28 GMT-6
@@ -36,10 +37,11 @@ import numpy as np
 from astropy.io import fits
 from astropy.stats import sigma_clip
 
+from misc import *
+
 from tqdm import tqdm
 
 from matplotlib.pyplot import *
-
 ion()
 
 
@@ -242,9 +244,9 @@ def get_corrected_bias(file_list_path, x_ovr_scn, ref='bias_0001', comb_method='
 
 	# Sigma clipping
 	# =================================================
-	sigma = sig_clip[0]
-	maxiters = sig_clip[1] 
-	zero_com = sigma_clip(zero_com, sigma=sigma, maxiters=maxiters)
+	box_width = sig_clip[0]
+	n_sigma = sig_clip[1] 
+	zero_com = sigma_clipping(zero_com, box_width=box_width, n_sigma=n_sigma, iterate=1)
 
 	# Get the bias zero
 	bias_zero = zero_com - pol_img
@@ -322,9 +324,9 @@ def get_corrected_flats(file_list_path, x_ovr_scn, bias_zero, ref='flat_0001', c
 
 	# Sigma clipping
 	# =================================================
-	sigma = sig_clip[0]
-	maxiters = sig_clip[1] 
-	#flat_comb = sigma_clip(flat_comb, sigma=sigma, maxiters=maxiters)
+	box_width = sig_clip[0]
+	n_sigma = sig_clip[1] 
+	flat_comb = sigma_clipping(flat_comb, box_width=box_width, n_sigma=n_sigma, iterate=1)
 
 	# Saving FITS file
 	# =================================================
@@ -431,13 +433,13 @@ overscan2 = -1
 
 # ===================== B I A S =====================
 # Sigma clipping parameters
-sig_clip = [5, 5]
+sig_clip = [9, 5]
 
 overscan = [xoverscan, overscan1, overscan2]
 bias_zero, bias_comb = get_corrected_bias('./HD126593/bias.list', overscan, sig_clip=sig_clip)
 
 # ==================== F L A T S ====================
-flat_comb = get_corrected_flats('./HD126593/flats.list', [xoverscan, 0, 0], bias_zero, sig_clip=[5, 5])
+flat_comb = get_corrected_flats('./HD126593/flats.list', [xoverscan, 0, 0], bias_zero, sig_clip=sig_clip)
 
 # ======== C O R R E C T I N G   I M A G E S ========
 objects = correct_images('./HD126593/stdstar.list', bias_zero, flat_comb, [xoverscan, 0, 0])
@@ -452,4 +454,3 @@ objects = correct_images('./HD126593/stdstar.list', bias_zero, flat_comb, [xover
 # NOTAS
 # 1. flat_comb no debería restarsele el bias zero, sería mejor quitarle 
 # el zero_com.
-# 2. Como esta funcionando el overscan (Posibles errores en el IDL)

@@ -22,7 +22,9 @@ import numpy as np
 from astropy.io import fits
 from astropy.stats import sigma_clip
 
-from tqdm import tqdm
+from scipy.ndimage import median_filter
+
+#from tqdm import tqdm
 
 def sky_level(img, skymode, skysig):
 
@@ -31,8 +33,6 @@ def sky_level(img, skymode, skysig):
 	ncol = size[1]
 
 	npts = nrow*ncol
-
-	if checkbad
 
 	maxsky = np.max(2*npts/(nrow-1), 10000)
 
@@ -106,3 +106,57 @@ def value_locate(vector, value):
 					break				
 
 	return result
+
+
+def sigma_clipping(img, box_width=3, n_sigma=2.5, iterate=5, monitor=True):
+
+	# Make sure width is odd
+	box_width = 2*(int(box_width/2))+1
+	print("Box width needs to be odd. Box width = ", box_width)
+
+	if box_width < 3:
+		print("Box width needs to be greater or equal to 3")
+		return
+
+	if iterate < 1 or iterate > 20:
+		print("Iterations between 1 - 20")
+		return 
+
+	bw = box_width**2
+
+	mean = (median_filter(img, size=box_width)*bw - img)/(bw - 1)
+
+	if n_sigma <= 0:
+		print("Sigma must be greater than 0")
+		return 
+
+	imdev = (img - mean)**2
+	fact = (n_sigma**2)/(bw - 2)
+
+	imvar = fact*(median_filter(imdev, size=box_width)*bw - imdev)
+
+	wok = np.where(imdev < imvar)
+	nok = wok[0].size
+
+	npix = img.size
+	nchange = npix - nok
+
+	if monitor:
+		print('{:.2f}% of pixels replaced, n_sigma = {:.1f}'.format(nchange*100./npix, n_sigma))
+
+	# Bad pixels are equal to the full pixels
+	if nok == npix:
+		print("All the pixels can't be replaced")
+		return
+
+	if nok > 0:
+		mean[wok] = img[wok]
+
+	# Solve for n iterations
+	if n_sigma >= 2:
+		iterate -= 1
+		if iterate == 0:
+			return mean 
+		return sigma_clipping(mean, box_width=box_width, n_sigma=n_sigma, iterate=iterate, monitor=monitor)
+
+	return mean
