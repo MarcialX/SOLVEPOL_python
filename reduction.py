@@ -417,10 +417,6 @@ def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, r
 	return object_no_flats
 
 
-
-subdir = 'solvepol'
-
-
 # CCD data: 
 # NOTA. Hay varios modelos con valores distintos.
 # Agregar mini base de datos o JSON file
