@@ -16,10 +16,11 @@
 #		*bias_flat_objnames.fits
 #
 # TODO list
-# 1. [07/02/2021]. Save corrected images
-# 2. [20/02/2021]. Sigma clipping
+# 1. [07/03/2021]. Functions to load data from existing fits
 #
-# Marcial Becerril, @ 24 January 2021
+# Marcial Becerril based on Edgar Andre SOLVEPOL repo
+# https://github.com/edgarandre/SOLVEPOL/blob/master/dither.pro, 
+# @ 24 January 2021
 # Latest Revision: 14 Feb 2021, 01:28 GMT-6
 #
 # For all kind of problems, requests of enhancements and bug reports, please
@@ -417,29 +418,34 @@ def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, r
 	return object_no_flats
 
 
-# CCD data: 
-# NOTA. Hay varios modelos con valores distintos.
-# Agregar mini base de datos o JSON file
+# ***************************************************
+# Commented block
 
-# Andor iKon-L936: 2048 X 2048
-# No overscan
-xoverscan = False
-overscan1 = 0
-overscan2 = -1
+# # CCD data: 
+# # NOTA. Hay varios modelos con valores distintos.
+# # Agregar mini base de datos o JSON file
 
-# ===================== B I A S =====================
-# Sigma clipping parameters
-sig_clip = [9, 5]
+# # Andor iKon-L936: 2048 X 2048
+# # No overscan
+# xoverscan = False
+# overscan1 = 0
+# overscan2 = -1
 
-overscan = [xoverscan, overscan1, overscan2]
-bias_zero, bias_comb = get_corrected_bias('./HD126593/bias.list', overscan, sig_clip=sig_clip)
+# # ===================== B I A S =====================
+# # Sigma clipping parameters
+# sig_clip = [9, 5]
 
-# ==================== F L A T S ====================
-flat_comb = get_corrected_flats('./HD126593/flats.list', [xoverscan, 0, 0], bias_zero, sig_clip=sig_clip)
+# overscan = [xoverscan, overscan1, overscan2]
+# bias_zero, bias_comb = get_corrected_bias('./HD126593/bias.list', overscan, sig_clip=sig_clip)
 
-# ======== C O R R E C T I N G   I M A G E S ========
-objects = correct_images('./HD126593/stdstar.list', bias_zero, flat_comb, [xoverscan, 0, 0])
+# # ==================== F L A T S ====================
+# flat_comb = get_corrected_flats('./HD126593/flats.list', [xoverscan, 0, 0], bias_zero, sig_clip=sig_clip)
 
+# # ======== C O R R E C T I N G   I M A G E S ========
+# objects = correct_images('./HD126593/stdstar.list', bias_zero, flat_comb, [xoverscan, 0, 0])
+
+
+# ***************************************************
 
 # Objectos reales
 # fits_list = get_fits_from_list('./HD126593/stdstar.list')

@@ -6,7 +6,9 @@
 # TODO list
 # 1. [14/02/2021]. Add Sigma clipping as IDL example
 #
-# Marcial Becerril, @ 14 February 2021
+# Marcial Becerril based on Edgar Andre SOLVEPOL repo
+# https://github.com/edgarandre/SOLVEPOL/blob/master/dither.pro, 
+# @ 14 February 2021
 # Latest Revision: 14 Feb 2021, 01:35 GMT-6
 #
 # For all kind of problems, requests of enhancements and bug reports, please
