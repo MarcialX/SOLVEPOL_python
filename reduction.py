@@ -400,7 +400,6 @@ def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, r
 
 	# FLAT CORRECTION
 	# =================================================
-
 	print ("Correcting by flats")
 	print ("=======================================")
 
@@ -418,39 +417,58 @@ def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, r
 	return object_no_flats
 
 
+def get_fits_file(file_path):
+	"""
+		Load FITS image
+		Parameters
+		----------
+		file_path : string
+			Fits file path
+		----------
+	"""
+	# Read the FITS image
+	fits_img = fits.open(file_path)
+	# Get header
+	fits_header = fits_img[0].header
+	# Get data
+	fits_data = fits_img[0].data
+
+	return fits_header, fits_data
+
+
 # ***************************************************
-# Commented block
+# Reduction exercise
 
-# # CCD data: 
-# # NOTA. Hay varios modelos con valores distintos.
-# # Agregar mini base de datos o JSON file
+# CCD data: 
+# NOTA. Hay varios modelos con valores distintos.
+# Agregar mini base de datos o JSON file
 
-# # Andor iKon-L936: 2048 X 2048
-# # No overscan
-# xoverscan = False
-# overscan1 = 0
-# overscan2 = -1
+# Andor iKon-L936: 2048 X 2048
+# No overscan
+xoverscan = False
+overscan1 = 0
+overscan2 = -1
 
-# # ===================== B I A S =====================
-# # Sigma clipping parameters
-# sig_clip = [9, 5]
+# ===================== B I A S =====================
+# Sigma clipping parameters
+sig_clip = [9, 5]
 
-# overscan = [xoverscan, overscan1, overscan2]
+overscan = [xoverscan, overscan1, overscan2]
+# Create bias image
 # bias_zero, bias_comb = get_corrected_bias('./HD126593/bias.list', overscan, sig_clip=sig_clip)
+# Or load one
+bias_zero_header, bias_zero = get_fits_file('./bias_corrected.fits')
 
-# # ==================== F L A T S ====================
+# ==================== F L A T S ====================
+# Create flats image
 # flat_comb = get_corrected_flats('./HD126593/flats.list', [xoverscan, 0, 0], bias_zero, sig_clip=sig_clip)
+# Or load one
+flat_comb_header, flat_comb = get_fits_file('./flats_corrected.fits')
 
-# # ======== C O R R E C T I N G   I M A G E S ========
-# objects = correct_images('./HD126593/stdstar.list', bias_zero, flat_comb, [xoverscan, 0, 0])
-
+# ======== C O R R E C T I N G   I M A G E S ========
+objects = correct_images('./HD126593/stdstar.list', bias_zero, flat_comb, [xoverscan, 0, 0])
 
 # ***************************************************
-
-# Objectos reales
-# fits_list = get_fits_from_list('./HD126593/stdstar.list')
-# img = list(fits_list.keys())[0]
-# obj_obs = fits_list[img]['fits'][0].data
 
 
 # NOTAS

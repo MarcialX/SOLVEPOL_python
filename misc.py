@@ -24,6 +24,7 @@ import numpy as np
 from astropy.io import fits
 from astropy.stats import sigma_clip
 
+from scipy import signal
 from scipy.ndimage import median_filter
 
 #from tqdm import tqdm
@@ -162,3 +163,44 @@ def sigma_clipping(img, box_width=3, n_sigma=2.5, iterate=5, monitor=True):
 		return sigma_clipping(mean, box_width=box_width, n_sigma=n_sigma, iterate=iterate, monitor=monitor)
 
 	return mean
+
+
+def correl_optimize(imgA, imgB, numpix, mag, xoff_init=0, yoff_init=0):
+
+	# Image size
+	simA = np.shape(imgA)
+	simB = np.shape(imgB)
+
+	if simA[0] < 2 or simB[0] < 2:
+		print("First two arguments must be images")
+		return
+
+	xoff = xoff_init
+	yoff = yoff_init
+
+	reducf = np.min([simA, simB])/8
+
+	if mag < 1:
+		mag = 1
+		print("Magnification cannot be lower than 1. Set to 1")
+		
+	xsize = np.max([simA[0], simB[0]])
+	ysize = np.max([simA[1], simB[1]])
+	xshift = xsize
+	yshift = ysize
+
+	while reducf > 1:
+		# Correlation
+		corr = signal.correlate2d(imgA, imgB, boundary='symm', mode='same')
+
+		# corrmat -> python
+
+		xshift = 2*reducf
+		yshift = 2*reducf
+		reducf = reducf/2
+
+	xshift = xshift/2
+	yshift = yshift/2
+
+	
+

@@ -129,10 +129,63 @@ def img_comb(img_list, shift, nwp, ref=None, *args, **kwargs):
 	return new_int_img
 
 
+def dithering(img_list, n_dither, *args, **kwargs):
+	"""
+		Combine Fits Images from a List
+		Parameters
+		----------
+		img_list : string
+			File path which contains the fits images paths.
+		shift	 : array
+			Dithering number
+		*args : additional arguments
+		**kwargs : additional keywords (for verbose)
+		----------
+	"""
+	# Check for verbose
+	verbose = kwargs.pop('verbose', None)
+
+	# Reading text file with images
+	# =================================================
+	fits_list = get_fits_from_list(img_list) 
+	imgs_names = list(fits_list.keys())
+	noImgs = len(imgs_names)
+
+	# *************************************************
+	# size_x = ref_img.header['NAXIS1']
+	# size_y = ref_img.header['NAXIS2']
+	# size = [size_x, size_y]
+
+	# int_img = np.zeros((noImgs, size_x, size_y))
+	# *************************************************
+
+	for n in range(0, noImgs, n_dither):
+
+		# Reference image
+		ref = list(fits_list.keys())[n]
+		ref_img = fits_list[ref]['fits'][0]
+
+		size_ref = np.shape(ref_img)
+
+		x_cntrd_shifts = np.zeros(n_dither)
+		y_cntrd_shifts = np.zeros(n_dither)
+
+		for i in range(n+1, n+n_dither):
+
+			print('Shift between '+imgs_names[n]+' and '+imgs_names[i]+' is:')
+
+			img = fits_list[imgs_names[i]]['fits'][0]
+			size_img = np.shape(img)
+
+			# Calculate the x and y cntrd_shift
+
+			print('x shift = ', x_cntrd_shifts)
+			print('y shift = ', y_cntrd_shifts)
+
 
 path_fits_list = './HD126593/stdstar.list'
 n = 4
 shift = [[1,2,3],[1,2,3]]
 
-d = img_comb(path_fits_list, shift, n, verbose=True)
-
+#d = img_comb(path_fits_list, shift, n, verbose=True)
+f = dithering(path_fits_list, 3, verbose=True)
