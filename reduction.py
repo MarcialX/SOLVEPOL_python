@@ -17,11 +17,12 @@
 #
 # TODO list
 # 1. [07/03/2021]. Functions to load data from existing fits
+# 2. [21/08/2021]. Reduction corrected and improved (much faster)
 #
 # Marcial Becerril based on Edgar Andre SOLVEPOL repo
 # https://github.com/edgarandre/SOLVEPOL/blob/master/dither.pro, 
 # @ 24 January 2021
-# Latest Revision: 14 Feb 2021, 01:28 GMT-6
+# Latest Revision: 21 Aug 2021, 01:28 GMT-6
 #
 # For all kind of problems, requests of enhancements and bug reports, please
 # write to me at:
@@ -36,7 +37,7 @@ import os
 import numpy as np
 
 from astropy.io import fits
-from astropy.stats import sigma_clip
+#from astropy.stats import sigma_clip
 
 from misc import *
 
@@ -67,13 +68,13 @@ def get_fits_from_list(file_list_path):
 			# File name 
 			fits_list[name]['path'] = file
 			# Read fits file
-			fits_list[name]['fits'] = fits.open(file)
-
+			z = fits.open(file)
+			fits_list[name]['fits'] = z
 
 	return fits_list
 
 
-def combine_images(int_img, size_x, size_y, method):
+def combine_images(int_img, method):
 	"""
 		Combine images
 		Parameters
@@ -83,24 +84,20 @@ def combine_images(int_img, size_x, size_y, method):
 			l : number of images
 			m : x-size
 			n : y-size
-		size_x : int
-			x length
-		size_y : int
-			y length
 		method : string
 			Combination method
 		----------
 	"""
-	comb = np.zeros((size_x, size_y))
+	#n_imgs, size_x, size_y = np.shape(int_img)
 	
 	# Combining the images from the cube
 	# =================================================
-	for i in tqdm(range(size_x), desc='Combining images'):
-		for j in range(size_y):
-			if method == 'avg':
-				comb[i,j] = np.mean(int_img[:,i,j]) 
-			elif method == 'med':
-				comb[i,j] = np.median(int_img[:,i,j]) 
+	if method == 'avg':
+		comb = np.average(int_img, axis=0)
+	elif method == 'med':
+		comb = np.median(int_img, axis=0)
+
+	print('Images combined :)')
 
 	return comb
 
@@ -125,6 +122,9 @@ def overscan_polynom(int_img, x_ovr_scn, size):
 	ovr_scn_2 = x_ovr_scn[2]
 
 	overscan_flag = False
+	
+	if ovr_scn_2 - ovr_scn_1 != 0:
+		overscan_flag = True
 
 	# Get size
 	size_x = size[0]
@@ -140,15 +140,10 @@ def overscan_polynom(int_img, x_ovr_scn, size):
 	if xoverscan:
 		# Over X-AXIS
 		# =============================================
-		img_overscan = np.zeros(size_x)
-
-		for m in range(size_x):
-			img_range = int_img[m,ovr_scn_1:ovr_scn_2]
-			if len(img_range) > 0:
-				overscan_flag = True
-				img_overscan[m] = np.mean(img_range)
-
 		if overscan_flag:
+			# Average in the overscan region
+			img_overscan = np.average(int_img[:, ovr_scn_1:ovr_scn_2], axis=1)
+
 			# Fitting the overscan region of the bias
 			fx = np.polyfit(axis_x, img_overscan, 2)
 			p = np.poly1d(fx)
@@ -160,22 +155,18 @@ def overscan_polynom(int_img, x_ovr_scn, size):
 	else:
 		# Over Y-AXIS
 		# =============================================
-		img_overscan = np.zeros(size_y)
-
-		for n in range(size_y):
-			img_range = int_img[ovr_scn_1:ovr_scn_2,n]
-			if len(img_range) > 0:
-				overscan_flag = True
-				img_overscan[n] = np.mean(img_range)
-
 		if overscan_flag:
+			# Average in the overscan region
+			img_overscan = np.average(int_img[ovr_scn_1:ovr_scn_2, :], axis=0)
+
 			# Fitting the overscan region of the bias
 			fy = np.polyfit(axis_y, img_overscan, 2)
-			p = np.poly1d(fy)	
+			p = np.poly1d(fy)
 
 			# Array with polynom
 			for m in range(size_x):
 				pols_img[m,:] = p(axis_y)
+
 
 	return pols_img
 
@@ -215,6 +206,8 @@ def get_corrected_bias(file_list_path, x_ovr_scn, ref='bias_0001', comb_method='
 		sig_clip : list
 			sig_clip[0] : sigma threshold
 			sig_clip[1] : max number of iterations
+		save : boolean
+			Save FITS image?
 		----------
 	"""
 	# Read the images
@@ -236,7 +229,7 @@ def get_corrected_bias(file_list_path, x_ovr_scn, ref='bias_0001', comb_method='
 		int_img[i,:,:] = fits_list[img]['fits'][0].data
 
 	# Combining bias images
-	zero_com = combine_images(int_img, size_x, size_y, comb_method)
+	zero_com = combine_images(int_img, comb_method)
 
 	# Averaging over all columns of the overscan region
 	# =================================================
@@ -321,7 +314,7 @@ def get_corrected_flats(file_list_path, x_ovr_scn, bias_zero, ref='flat_0001', c
 		i += 1
 
 	# Combining bias images
-	flat_comb = combine_images(flat_no_bias, size_x, size_y, comb_method)
+	flat_comb = combine_images(flat_no_bias, comb_method)
 
 	# Sigma clipping
 	# =================================================
@@ -340,7 +333,7 @@ def get_corrected_flats(file_list_path, x_ovr_scn, bias_zero, ref='flat_0001', c
 	return flat_comb
 
 
-def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, ref="HD126593_L0_1"):
+def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, ref="HD126593_L0_1", save=True):
 	"""
 		Correct images
 		Parameters
@@ -356,6 +349,8 @@ def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, r
 			x_ovr_scn[1:2] : min and max limits of the scan
 		ref : string
 			Reference image. 'HD126593_L0_1' by default 
+		save : boolean
+			Save FITS image?
 		----------
 	"""
 	# Read the images
@@ -410,14 +405,33 @@ def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, r
 	medValFlat = np.median(flats_corrected)
 	for i in tqdm(range(noImgs), desc='Correcting by flats'):
 				
-		object_no_flats[i,:,:] = (object_no_bias[i,:,:])*(medValFlat/ flats_corrected)
+		object_no_flats[i,:,:] = (object_no_bias[i,:,:])*(medValFlat / flats_corrected)
 
 	print ("Done")
+
+	# Saving FITS file
+	# =================================================			
+	if save:
+
+		print ("Saving Corrected Objects")
+		print ("=======================================")
+
+		c = 0
+		for i in fits_list.keys():
+			# Extracting header
+			hdr = fits_list[i]['fits'][0].header
+		
+			name = i+'_corrected'
+			print ("Saving FITS object file as: "+name)
+			write_fits(name, hdr, object_no_flats[c])
+			c += 1
+
+		print("Done")
 
 	return object_no_flats
 
 
-def get_fits_file(file_path):
+def read_fits_file(file_path):
 	"""
 		Load FITS image
 		Parameters
@@ -447,26 +461,28 @@ def get_fits_file(file_path):
 # No overscan
 xoverscan = False
 overscan1 = 0
-overscan2 = -1
+overscan2 = 0
 
 # ===================== B I A S =====================
 # Sigma clipping parameters
-sig_clip = [9, 5]
+sig_clip = [128, 3]
 
 overscan = [xoverscan, overscan1, overscan2]
+
 # Create bias image
-# bias_zero, bias_comb = get_corrected_bias('./HD126593/bias.list', overscan, sig_clip=sig_clip)
+#bias_zero, bias_comb = get_corrected_bias('./HD126593/bias.list', overscan, sig_clip=sig_clip)
 # Or load one
-bias_zero_header, bias_zero = get_fits_file('./bias_corrected.fits')
+bias_zero_header, bias_zero = read_fits_file('./bias_corrected.fits')
 
 # ==================== F L A T S ====================
 # Create flats image
-# flat_comb = get_corrected_flats('./HD126593/flats.list', [xoverscan, 0, 0], bias_zero, sig_clip=sig_clip)
+#flat_comb = get_corrected_flats('./HD126593/flats.list', overscan, bias_zero, sig_clip=sig_clip)
 # Or load one
-flat_comb_header, flat_comb = get_fits_file('./flats_corrected.fits')
+flat_comb_header, flat_comb = read_fits_file('./flats_corrected.fits')
 
 # ======== C O R R E C T I N G   I M A G E S ========
-objects = correct_images('./HD126593/stdstar.list', bias_zero, flat_comb, [xoverscan, 0, 0])
+objects = correct_images('./HD126593/stdstar.list', bias_zero, flat_comb, overscan, save=False)
+
 
 # ***************************************************
 

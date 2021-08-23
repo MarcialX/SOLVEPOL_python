@@ -25,10 +25,13 @@ from astropy.io import fits
 from astropy.stats import sigma_clip
 
 from scipy import signal
-from scipy.ndimage import median_filter
+#from scipy.ndimage import median_filter
+from scipy.ndimage import gaussian_filter
 
 #from tqdm import tqdm
 
+
+# [INCOMPLETE FUNCTION]. It looks it is not needed anymore.
 def sky_level(img, skymode, skysig):
 
 	size = np.shape(img)
@@ -66,7 +69,6 @@ def sky_level(img, skymode, skysig):
 			skyvec = [skyvec, skyvec[0:200]*0]
 
 	skyvec = skyvec[0:jj-1]
-
 
 
 def value_locate(vector, value):
@@ -113,9 +115,6 @@ def value_locate(vector, value):
 
 def sigma_clipping(img, box_width=3, n_sigma=2.5, iterate=5, monitor=True):
 
-	# Make sure width is odd
-	box_width = 2*(int(box_width/2))+1
-	print("Box width needs to be odd. Box width = ", box_width)
 
 	if box_width < 3:
 		print("Box width needs to be greater or equal to 3")
@@ -127,7 +126,7 @@ def sigma_clipping(img, box_width=3, n_sigma=2.5, iterate=5, monitor=True):
 
 	bw = box_width**2
 
-	mean = (median_filter(img, size=box_width)*bw - img)/(bw - 1)
+	mean = (gaussian_filter(img, sigma=box_width)*bw - img)/(bw - 1)
 
 	if n_sigma <= 0:
 		print("Sigma must be greater than 0")
@@ -136,7 +135,7 @@ def sigma_clipping(img, box_width=3, n_sigma=2.5, iterate=5, monitor=True):
 	imdev = (img - mean)**2
 	fact = (n_sigma**2)/(bw - 2)
 
-	imvar = fact*(median_filter(imdev, size=box_width)*bw - imdev)
+	imvar = fact*(gaussian_filter(imdev, sigma=box_width)*bw - imdev)
 
 	wok = np.where(imdev < imvar)
 	nok = wok[0].size
