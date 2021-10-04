@@ -40,6 +40,7 @@ from astropy.io import fits
 #from astropy.stats import sigma_clip
 
 from misc import *
+from fits_tools import *
 
 from tqdm import tqdm
 
@@ -74,7 +75,7 @@ def get_fits_from_list(file_list_path):
 	return fits_list
 
 
-def combine_images(int_img, method):
+def combine_images(int_img, method='avg'):
 	"""
 		Combine images
 		Parameters
@@ -430,24 +431,6 @@ def correct_images(file_list_path, bias_corrected, flats_corrected, x_ovr_scn, r
 
 	return object_no_flats
 
-
-def read_fits_file(file_path):
-	"""
-		Load FITS image
-		Parameters
-		----------
-		file_path : string
-			Fits file path
-		----------
-	"""
-	# Read the FITS image
-	fits_img = fits.open(file_path)
-	# Get header
-	fits_header = fits_img[0].header
-	# Get data
-	fits_data = fits_img[0].data
-
-	return fits_header, fits_data
 
 
 # ***************************************************
