@@ -89,6 +89,10 @@ def find_objs(data, *args, **kwargs):
 
 	# Key arguments
 	# ----------------------------------------------
+	# Write file
+	write_file = kwargs.pop('write_file', True)
+	# Name file
+	filename = kwargs.pop('filename', 'sources.find')
 	# Verbose key
 	verbose = kwargs.pop('verbose', True)
 	# ----------------------------------------------
@@ -273,6 +277,13 @@ def find_objs(data, *args, **kwargs):
 	# Create results table
 	print('STAR\tX\tY\tFLUX\tSHARP\tROUND')
 
+	# If data will be write it in a file
+	if write_file:
+		# Create file
+		find_file = open(filename, "w+")
+		# Write header
+		find_file.write('STAR\tX\tY\tFLUX\tSHARP\tROUND\n')
+
 	# Loop over star positions.
 	# Compute statistics
 
@@ -349,6 +360,10 @@ def find_objs(data, *args, **kwargs):
 		if verbose:
 			print ('%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f'%(nstar, xcen, ycen, d, sharp1, around))
 
+		if write_file:
+			# Write a line for every single object found
+			find_file.write('%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n'%(nstar+1, xcen, ycen, d, sharp1, around))
+
 		if npar >= 2:
 			x[nstar] = xcen
 			y[nstar] = ycen
@@ -367,6 +382,10 @@ def find_objs(data, *args, **kwargs):
 		print('No. of sources rejected by sharpness criteria: ', badsharp)
 		print('No. of sources rejected by roundness criteria: ', badround)
 		print('No. of sources rejected by centroid criteria: ', badcntrd)
+
+	if write_file:
+		# Close written file
+		find_file.close()
 
 	if nstar > 0:
 		if npar >= 2:
@@ -388,9 +407,8 @@ def find_objs(data, *args, **kwargs):
 		return
 
 
-
 # Read FITS file
 filename = './HD126593_L0_0_corrected.fits'
 header, data = read_fits_file(filename)
 
-x, y = find_objs(data, 30, 10)
+x, y = find_objs(data, 15, 10, write_file=True)
