@@ -1,0 +1,68 @@
+# -*- coding: utf-8 -*-
+# --------------------------------------------------------------------------------- #
+# SOLVEPOL-Catalogs
+# Polarimetric standard stars
+#
+# Marcial Becerril based on Edgar Andre SOLVEPOL repo
+# https://github.com/edgarandre/SOLVEPOL/blob/master/dither.pro, 
+# @ 18 October 2021
+# Latest Revision: 18 Oct 2021, 00:03 GMT-6
+#
+# For all kind of problems, requests of enhancements and bug reports, please
+# write to me at:
+#
+# mbecerrilt92@gmail.com
+# mbecerrilt@inaoep.mx
+#
+# --------------------------------------------------------------------------------- #
+
+# NAME	RA(2000)	DEC(2000)	THETA lit (V-band)	P	dP	Ref
+HD23512	56.6425	+23.6240	29.9	2.26	0.01	Hsu & Breger 1982
+HD283812	71.1039	+25.5285	33.8	4.27	0.012	Turnshek et al. 1990
+HD41117	90.9800	+20.1385	174.9	2.85	None	Coyne & Gehrels 1966)
+HD251204	91.2736	+23.3940	147.0	4.04	0.066	Turnshek et al. 1990
+HD42087	92.4333	+23.1135	171.5	2.14	None	Serkowski, Mathewson & Ford 1975
+HD43384	94.2446	+23.7409	169.8	2.94	0.04	Hsu & Breger 1982
+HD80558	139.676	-51.5606	162.1	3.111	0.008	Bastien et al. 1988
+HD298383	140.624	-52.4826	148.6	5.23	0.009	Turnshek et al. 1990
+HD84810	146.321	-62.5033	99.8	1.578	0.010	Bastien et al. 1988
+HD110984	191.687	-61.1865	91.6	5.70	0.007	Turnshek et al. 1990
+HD111579	192.765	-61.2438	103.1	6.46	0.014	Turnshek et al. 1990
+HD111613	192.825	-60.3298	80.2	3.057	0.008	Bastien et al. 1988
+HD126593	217.212	-60.5403	75.2	5.02	0.012	Turnshek et al. 1990
+HD127769	218.398	-16.3933	54.0	1.489	0.021	Clemens & Tapia 1990
+HD142863	239.262	-2.98868	83.7	1.891	0.063	Clemens & Tapia 1990
+HD145502	242.999	-19.4607	140.4	1.21	None	Serkowski et al. 1975
+HD147084	245.159	-24.1693	32.9	4.17	0.008	Turnshek et al. 1990
+HD147889	246.351	-24.4657	177.0	3.56	0.09	Bailey & Hough 1982
+HD147932	246.396	-23.4052	58.8	2.84	None	Coyne & Wickramasinghe 1969
+HD149757	249.290	-10.5671	126.0	1.44	0.04	Bailey & Hough 1982
+HD154445	256.384	-0.892067	88.03	3.80	0.075	Turnshek et al. 1990
+HD155197	257.566	-4.83435	103.2	4.38	0.03	Turnshek et al. 1990
+HD155528	258.083	-4.40258	93.7	4.849	0.052	Clemens & Tapia 1990
+HD160529	265.496	-33.5038	21.2	7.081	0.097	Mathewson & Ford 1970
+HD161056	265.946	-7.0796	67.01	4.035	0.038	Turnshek et al. 1990
+HD161753	266.907	-6.56577	46.6	4.171	0.091	Clemens & Tapia 1990
+HD162061	267.391	-11.8990	65.8	3.177	0.142	Clemens & Tapia 1990
+HD165175	271.182	+0.842850	53.9	1.801	0.046	Clemens & Tapia 1990
+HD168625	275.331	-16.3739	14.0	4.42	0.20	Heiles 2000
+HD170938	278.157	-15.7016	119.0	3.69	0.20	Heiles 2000
+HD172252	279.916	-11.8786	148.0	4.65	0.20	Heiles 2000
+HD181474	290.141	+0.654078	74.6	1.150	0.015	Clemens & Tapia 1990
+HD183143	291.860	+18.2960	179.6	5.737	0.032	Clemens & Tapia 1990
+HD185198	294.473	+1.49926	76.0	1.675	0.035	Clemens & Tapia 1990
+HD187929	298.118	+1.00566	93.9	1.704	0.012	Bastien et al. 1988
+HD185859	295.118	+20.4771	4.7	2.37	None	Coyne & Wickramasinghe 1969
+
+#NAMEnoPOL	RA(2000)	DEC(2000)	THETA_lit (V-band)	P	dP	Ref
+HD10476	25.6240	20.2685	168.9	0.016	0.011	Bastien et al. 1988
+HD12021	29.4839	-2.09936	160.10	0.078	0.018	Schmidt et al. 1992
+HD14069	34.1883	7.68630	156.57	0.022	0.019	Schmidt et al. 1992
+HD15318	37.0398	8.46006	114.40	0.085	0.024	Schmidt et al. 1992
+HD20630	49.8404	3.37020	151.6	0.005	0.008	Bastien et al. 1988
+HD39587	88.5958	20.2762	141.2	0.006	0.007	Bastien et al. 1988
+HD43834	92.5603	-74.7530	151.0	0.02	None	Serkowski, Mathewson & Ford 1975
+HD100623	173.623	-32.8313	150.0	0.07	None	Serkowski, Mathewson & Ford 1975
+HD109055	187.922	22.1234	None	0.015	0.031	Clemens & Tapia 1990
+HD176425	285.535	-41.9105	None	0.01	None	Tapia 1988 
+HD209100	330.840	-56.7860	44.0	0.01	None	Serkowski, Mathewson & Ford 1975
