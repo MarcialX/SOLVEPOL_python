@@ -8,7 +8,7 @@
 # Outputs:
 #
 # Marcial Becerril based on Edgar Andre SOLVEPOL repo
-# https://github.com/edgarandre/SOLVEPOL/blob/master/dither.pro, 
+# https://github.com/edgarandre/SOLVEPOL/blob/master/dither.pro,
 # @ 17 October 2021
 # Latest Revision: 17 Oct 2021, 21:36 GMT-6
 #
@@ -57,9 +57,10 @@ def read_pair_file(filename):
 		if 'PAIR ' in line:
 			pairnum = line.split('PAIR ')[1]
 			pair_name = 'P'+pairnum[:-1]
-			pairs[pair_name] = {}
-			obj_cnt = 1
-			flag_pair = True
+			if pairnum[:-1].isnumeric():
+				pairs[pair_name] = {}
+				obj_cnt = 1
+				flag_pair = True
 
 		elif flag_pair:
 			line_fields = line.split('\t')
